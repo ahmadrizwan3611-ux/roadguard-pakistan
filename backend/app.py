@@ -262,6 +262,21 @@ def serve_static(path):
         return "File not found", 404
 
 
+@app.route("/frontend/<path:path>")
+def serve_frontend_assets(path):
+    return send_from_directory("frontend", path)
+
+
+@app.route("/<path:path>")
+def catch_all(path):
+    if path.startswith("static") or path.startswith("frontend"):
+        try:
+            return send_from_directory("frontend", path)
+        except:
+            pass
+    return send_from_directory("frontend", "index.html")
+
+
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5000"))
     debug = os.getenv("FLASK_DEBUG", "false").lower() == "true"

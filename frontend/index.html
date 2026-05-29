@@ -16,18 +16,18 @@
         }
 
         .neon-text {
-            text-shadow: 0 0 15px #22d3ee, 0 0 30px #67e8f9;
+            text-shadow: 0 0 20px #22d3ee, 0 0 40px #67e8f9;
         }
 
         .glass {
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(103, 232, 249, 0.3);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(103, 232, 249, 0.4);
         }
 
         .glow-button:hover {
-            box-shadow: 0 0 30px #22d3ee, 0 0 50px #67e8f9;
-            transform: scale(1.05);
+            box-shadow: 0 0 35px #22d3ee;
+            transform: translateY(-4px);
         }
     </style>
 </head>
@@ -35,60 +35,88 @@
 <body class="min-h-screen text-cyan-100">
 
     <div class="max-w-7xl mx-auto p-6">
-        <header class="flex justify-between items-center py-8 border-b border-cyan-500/20">
+        <!-- Header -->
+        <header class="flex justify-between items-center py-6 border-b border-cyan-500/30">
             <div class="flex items-center gap-4">
                 <div
-                    class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-2xl font-bold">
+                    class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-3xl font-bold">
                     RG</div>
                 <h1 class="text-4xl font-bold neon-text">ROADGUARD</h1>
             </div>
-            <div class="text-emerald-400">● LIVE IN PAKISTAN</div>
+            <div class="flex gap-8 text-sm">
+                <a href="#" onclick="showSection('report')" class="hover:text-cyan-400">Report Hazard</a>
+                <a href="#" onclick="showSection('map')" class="hover:text-cyan-400">Live Map</a>
+                <a href="#" onclick="showSection('myreports')" class="hover:text-cyan-400">My Reports</a>
+                <a href="#" onclick="showSection('ai')" class="hover:text-cyan-400">AI Analysis</a>
+            </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-8">
-            <!-- Report Form -->
-            <div class="lg:col-span-5 glass rounded-3xl p-8">
-                <h2 class="text-3xl font-bold mb-6">Report Hazard</h2>
+        <!-- Report Section -->
+        <div id="report-section" class="section grid grid-cols-1 lg:grid-cols-2 gap-8 mt-10">
+            <div class="glass rounded-3xl p-10">
+                <h2 class="text-3xl font-bold mb-8">Report a Road Hazard</h2>
+                <button onclick="getCurrentLocation()"
+                    class="w-full glow-button bg-gradient-to-r from-cyan-500 to-blue-600 py-6 rounded-2xl text-xl mb-6">
+                    📍 Detect My Location
+                </button>
 
-                <div class="space-y-6">
-                    <button onclick="getCurrentLocation()"
-                        class="w-full glow-button bg-gradient-to-r from-cyan-500 to-blue-600 py-5 rounded-2xl text-xl font-semibold">
-                        📍 Detect My Location
-                    </button>
+                <select id="hazardType" class="w-full glass p-5 rounded-2xl mb-6 text-lg">
+                    <option value="pothole">Pothole</option>
+                    <option value="accident">Accident</option>
+                    <option value="flood">Flooding</option>
+                    <option value="roadblock">Road Blockage</option>
+                </select>
 
-                    <select id="hazardType" class="w-full glass p-4 rounded-2xl text-white">
-                        <option value="pothole">🕳️ Pothole</option>
-                        <option value="accident">🚨 Accident</option>
-                        <option value="flood">🌊 Flooding</option>
-                        <option value="roadblock">🚧 Road Blockage</option>
-                        <option value="other">⚠️ Other</option>
-                    </select>
+                <textarea id="description" rows="5" class="w-full glass p-5 rounded-3xl mb-6"
+                    placeholder="Describe the hazard..."></textarea>
 
-                    <textarea id="description" rows="4" class="w-full glass p-5 rounded-3xl text-white"
-                        placeholder="Describe the hazard..."></textarea>
-
-                    <button onclick="submitReport()"
-                        class="w-full glow-button py-6 rounded-3xl text-2xl font-bold bg-gradient-to-r from-red-500 to-orange-600">
-                        🚨 SUBMIT REPORT
-                    </button>
-                </div>
+                <button onclick="submitReport()"
+                    class="w-full glow-button py-7 rounded-3xl text-2xl font-bold bg-gradient-to-r from-red-500 to-orange-600">
+                    🚨 SUBMIT REPORT
+                </button>
             </div>
 
-            <!-- Map -->
-            <div class="lg:col-span-7">
-                <div class="glass rounded-3xl p-6 h-[500px]">
-                    <h3 class="text-2xl font-bold mb-4">Live Hazards Map</h3>
-                    <div id="map" class="w-full h-[420px] rounded-2xl"></div>
-                </div>
+            <div class="glass rounded-3xl p-10">
+                <h3 class="text-2xl font-bold mb-4">AI Risk Analysis</h3>
+                <div id="ai-result" class="min-h-64 text-cyan-200"></div>
             </div>
+        </div>
+
+        <!-- Map Section -->
+        <div id="map-section" class="section hidden">
+            <div class="glass rounded-3xl p-8">
+                <h2 class="text-3xl font-bold mb-6">Live Hazards Map - Pakistan</h2>
+                <div id="map" class="w-full h-[600px] rounded-3xl"></div>
+            </div>
+        </div>
+
+        <!-- My Reports -->
+        <div id="myreports-section" class="section hidden glass rounded-3xl p-8">
+            <h2 class="text-3xl font-bold mb-6">My Reports</h2>
+            <div id="my-reports-list" class="space-y-4"></div>
+        </div>
+
+        <!-- AI Analysis -->
+        <div id="ai-section" class="section hidden glass rounded-3xl p-8">
+            <h2 class="text-3xl font-bold mb-6">AI Safety Analysis</h2>
+            <textarea id="ai-input" class="w-full glass p-6 rounded-3xl h-48"
+                placeholder="Paste hazard description for deep AI analysis..."></textarea>
+            <button onclick="analyzeWithAI()" class="mt-6 glow-button px-10 py-4 bg-cyan-600 rounded-2xl">Analyze with
+                Groq AI</button>
         </div>
     </div>
 
     <script>
-        let map, userMarker, hazardsLayer;
+        let map, hazardsLayer;
+
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(section + '-section').classList.remove('hidden');
+            if (section === 'map') loadMap();
+        }
 
         function initMap() {
-            map = L.map('map').setView([31.52, 74.32], 13);
+            map = L.map('map').setView([31.52, 74.32], 12);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
             hazardsLayer = L.layerGroup().addTo(map);
         }
@@ -96,71 +124,55 @@
         async function getCurrentLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
-                    const lat = pos.coords.latitude;
-                    const lng = pos.coords.longitude;
-
-                    if (userMarker) map.removeLayer(userMarker);
-                    userMarker = L.marker([lat, lng]).addTo(map).bindPopup("You are here").openPopup();
-                    map.setView([lat, lng], 15);
+                    alert(`📍 Location: ${pos.coords.latitude}, ${pos.coords.longitude}`);
                 });
             }
         }
 
         async function submitReport() {
-                const description = document.getElementById("description").value.trim();
-                const type = document.getElementById("hazardType").value;
+            const desc = document.getElementById("description").value;
+            if (!desc) return alert("Please describe the hazard");
 
-                if (!description) return alert("Please describe the hazard");
+            const res = await fetch('/roadguard/report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    latitude: 31.52,
+                    longitude: 74.32,
+                    type: document.getElementById("hazardType").value,
+                    description: desc
+                })
+            });
 
-                // Get real location if available
-                let lat = 31.52;
-                let lng = 74.32;
+            const data = await res.json();
+            if (data.success) {
+                alert("✅ Report Submitted Successfully!");
+                document.getElementById("description").value = "";
+                loadNearbyHazards();
+            }
+        }
 
-                if (userMarker) {
-                    lat = userMarker.getLatLng().lat;
-                    lng = userMarker.getLatLng().lng;
-                }
-
-                const response = await fetch('/roadguard/report', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        latitude: lat,
-                        longitude: lng,
-                        type: type,
-                        description: description
-                    })
+        async function loadNearbyHazards() {
+            try {
+                const res = await fetch('/roadguard/nearby?lat=31.52&lng=74.32&radius=20');
+                const data = await res.json();
+                hazardsLayer.clearLayers();
+                data.hazards.forEach(h => {
+                    L.marker([h.latitude, h.longitude]).addTo(hazardsLayer)
+                        .bindPopup(`<b>${h.hazard_type}</b><br>${h.description}`);
                 });
+            } catch (e) { }
+        }
 
-                const data = await response.json();
+        function loadMap() {
+            if (!map) initMap();
+            loadNearbyHazards();
+        }
 
-                if (data.success) {
-                    alert("✅ Hazard Reported Successfully! Thank you.");
-                    document.getElementById("description").value = "";
-                    loadNearbyHazards();
-                } else {
-                    alert("❌ Error: " + (data.error || "Failed to report"));
-                }
-            }
-
-            async function loadNearbyHazards() {
-                try {
-                    const res = await fetch('/roadguard/nearby?lat=31.52&lng=74.32&radius=15');
-                    const data = await res.json();
-
-                    hazardsLayer.clearLayers();
-
-                    if (data.hazards && data.hazards.length > 0) {
-                        data.hazards.forEach(h => {
-                            L.marker([h.latitude, h.longitude])
-                                .addTo(hazardsLayer)
-                                .bindPopup(`<b>${h.hazard_type}</b><br>${h.description || ''}`);
-                        });
-                    }
-                } catch (e) {
-                    console.log("Could not load hazards");
-                }
-            }
+        // Initial Load
+        window.onload = () => {
+            showSection('report');
+        };
     </script>
 </body>
 
