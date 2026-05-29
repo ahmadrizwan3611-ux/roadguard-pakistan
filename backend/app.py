@@ -244,6 +244,24 @@ def health_check():
     )
 
 
+# ==================== SERVE FRONTEND ====================
+@app.route("/")
+def serve_frontend():
+    return send_from_directory("frontend", "index.html")
+
+
+@app.route("/<path:path>")
+def serve_static(path):
+    if path.startswith("frontend/"):
+        path = path[9:]  # remove "frontend/"
+    try:
+        return send_from_directory("frontend", path)
+    except:
+        if path.endswith(".html") or not "." in path:
+            return send_from_directory("frontend", "index.html")
+        return "File not found", 404
+
+
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5000"))
     debug = os.getenv("FLASK_DEBUG", "false").lower() == "true"
